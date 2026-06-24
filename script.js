@@ -1374,7 +1374,10 @@ async function loadHomeContent() {
       topResultsContainer.innerHTML = topResults.map(t => `
         <button class="result-card play-trigger" data-title="${t.title}" data-artist="${t.uploader}" data-cover="${t.thumbnail}" data-videoid="${t.videoId}" data-duration="180" aria-label="Play ${t.title}">
           <img src="${t.thumbnail}" alt="${t.title}" onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400'" />
-          <span>${t.title}</span>
+          <div class="card-meta">
+            <p>${t.title}</p>
+            <span>${t.uploader}</span>
+          </div>
         </button>
       `).join('');
     }
@@ -1406,8 +1409,6 @@ async function loadHomeContent() {
     console.error('Failed to load home content:', e);
   }
 }
-
-loadHomeContent();
 
 document.addEventListener('click', (e) => {
   const playTrigger = e.target.closest('.play-trigger');
@@ -1533,57 +1534,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-function renderDynamicRecommendations() {
-  const recommendationsList = document.querySelector('.recommendations');
-  if (!recommendationsList) return;
 
-  const mockRecommendations = [
-    { title: "Northern Lights", artist: "Juno Hale", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=240", videoId: "9W999W9W9W1" },
-    { title: "Static Bloom", artist: "Cira Nova", cover: "https://images.unsplash.com/photo-1501612780327-45045538702b?w=240", videoId: "hT_nvWreI6o" },
-    { title: "Aftertone", artist: "Rhea Knox", cover: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=240", videoId: "9W999W9W9W2" },
-    { title: "Velvet Pulse", artist: "Juno Hale", cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=240", videoId: "9W999W9W9W3" },
-    { title: "Echo Valley", artist: "Cira Nova", cover: "https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?w=240", videoId: "9W999W9W9W4" },
-    { title: "Smooth Operator", artist: "Sade", cover: "https://i.ytimg.com/vi/4TYv2PhG89A/maxresdefault.jpg", videoId: "4TYv2PhG89A" },
-    { title: "Midnight City", artist: "M83", cover: "https://images.unsplash.com/photo-1459749411177-04218006d396?w=240", videoId: "9W999W9W9W5" },
-    { title: "Starlight", artist: "Muse", cover: "https://images.unsplash.com/photo-1496293455970-f8581aae0e3c?w=240", videoId: "9W999W9W9W6" }
-  ];
-
-  recommendationsList.innerHTML = mockRecommendations.map(song => `
-    <li>
-      <button class="recommendation-play play-trigger" 
-              data-title="${song.title}" 
-              data-artist="${song.artist}" 
-              data-cover="${song.cover}" 
-              data-videoid="${song.videoId}"
-              data-duration="240">
-        <img src="${song.cover}" alt="${song.title}" />
-        <div>
-          <p>${song.title}</p>
-          <span>${song.artist}</span>
-        </div>
-      </button>
-      <button class="like-btn" data-videoid="${song.videoId}" data-title="${song.title}" data-artist="${song.artist}" data-cover="${song.cover}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-      <button class="menu-button" aria-haspopup="dialog">⋯</button>
-    </li>
-  `).join('');
-
-  recommendationsList.querySelectorAll('.play-trigger').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const track = {
-        title: btn.dataset.title,
-        artist: btn.dataset.artist,
-        cover: btn.dataset.cover,
-        videoId: btn.dataset.videoid,
-        duration: 240
-      };
-      playTrackDirectly(track);
-    });
-  });
-
-  updateLikeButtons();
-}
 
 function playTrackDirectly(track) {
   const existingIndex = tracks.findIndex(t => t.videoId === track.videoId);
@@ -1596,7 +1547,7 @@ function playTrackDirectly(track) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderDynamicRecommendations();
+  loadHomeContent();
   renderPlaylists();
 
   // Category clicks trigger search
