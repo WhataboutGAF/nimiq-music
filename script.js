@@ -182,7 +182,13 @@ window.onYouTubeIframeAPIReady = function() {
     height: '0', width: '0',
     playerVars: { controls: 0, autoplay: 1 },
     events: {
-      onReady: () => { ytReady = true; },
+      onReady: () => {
+        ytReady = true;
+        while (currentTrackQueue.length > 0) {
+          const t = currentTrackQueue.shift();
+          playYT(t.videoId, t.title, t.artist, t.cover);
+        }
+      },
       onStateChange: (e) => {
         if (e.data === YT.PlayerState.PLAYING) setPlaying(true);
         else if (e.data === YT.PlayerState.PAUSED) setPlaying(false);
