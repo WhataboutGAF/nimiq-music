@@ -67,61 +67,15 @@ let activeTab = 'home';
 let filteredIndexes = tracks.map((_, index) => index);
 let isBlackTheme = localStorage.getItem('theme') === 'dark';
 let selectedTrack = null;
-let ytPlayer = null;
-let isPlayerReady = false;
-let ytReady = false;
+
 let mockResults = [];
 let currentPlaylistIndex = null;
 let playlists = JSON.parse(localStorage.getItem('nimiq_playlists') || '[]');
 let history = JSON.parse(localStorage.getItem('nimiq_history') || '[]');
 let likedSongs = JSON.parse(localStorage.getItem('nimiq_liked') || '[]');
-const TEST_SONG = { title: "Smooth Operator", artist: "Sade", id: "4TYv2PhG89A", cover: "https://i.ytimg.com/vi/4TYv2PhG89A/maxresdefault.jpg" };
 
-function playNimiq(url) {
-  const audio = document.getElementById('main-audio');
-  if (!audio) return;
-  audio.src = url;
-  const playPromise = audio.play();
-  if (playPromise !== undefined) {
-    playPromise
-      .then(() => setPlaying(true))
-      .catch(error => console.log('Playback prevented:', error));
-  }
-}
 
-function playTestSong() {
-  if (!isPlayerReady) return;
-  try {
-    if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-      ytPlayer.loadVideoById(TEST_SONG.id);
-      ytPlayer.playVideo();
-      localStorage.setItem('currentSongID', TEST_SONG.id);
-      updateMiniPlayerMetadata(TEST_SONG.title, TEST_SONG.artist, TEST_SONG.cover, TEST_SONG.id);
-      if (miniPlayer) {
-        requestAnimationFrame(() => {
-          if (miniPlayer) miniPlayer.classList.add('is-visible');
-        });
-      }
-    }
-  } catch (e) {}
-}
 
-function searchYoutube(query) {
-  mockResults = [
-    { title: "Smooth Operator", artist: "Sade", youtubeId: "4TYv2PhG89A" },
-    { title: "Your Love", artist: "Frank Ocean", youtubeId: "bpZ3r2T2_jA" },
-    { title: "Thinking Out Loud", artist: "Ed Sheeran", youtubeId: "gfFnS3gk2lk" }
-  ];
-  if (searchResults) {
-    searchResults.innerHTML = mockResults.slice(0, 5).map(r => `
-      <li class="search-result-item">
-        <button class="search-result-btn" data-yt="${r.youtubeId}" aria-label="Play ${r.title}">
-          <span>${r.title} - ${r.artist}</span>
-        </button>
-      </li>
-    `).join('');
-  }
-}
 
 async function searchNimiq(query) {
   if (!query || query.trim().length < 2) {
@@ -237,7 +191,7 @@ async function getAudioStream(videoId) {
     if (!audio) return false;
     
     audio.src = data.url;
-    currentPlayingTrack = { videoId, title: 'Loading...', artist: '...', cover: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
+    currentPlayingTrack = { videoId, title: data.title, artist: data.artist, cover: data.thumbnail || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
     
     const playPromise = audio.play();
     if (playPromise !== undefined) {
@@ -263,74 +217,7 @@ async function getAudioStream(videoId) {
   }
 }
 
-function searchMusic(query) {
-  if (!query || query.trim().length < 2) {
-    if (searchResults) searchResults.innerHTML = '';
-    return;
-  }
-  fetch(`https://suggestqueries.google.com/complete/search?client=youtube&ds=yt&q=${encodeURIComponent(query)}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!searchResults) return;
-      const suggestions = data[1] || [];
-      if (suggestions.length === 0) {
-        searchResults.innerHTML = '<li class="search-result-item"><div class="placeholder-card"><p>No results found</p></div></li>';
-        return;
-      }
-      searchResults.innerHTML = suggestions.slice(0, 6).map((s, i) => `
-        <li class="search-result-item">
-          <button class="search-result-btn" data-query="${s[0]}" aria-label="Search ${s[0]}">
-            <span>${s[0]}</span>
-          </button>
-        </li>
-      `).join('');
-    })
-    .catch(() => {
-      if (searchResults) searchResults.innerHTML = '<li class="search-result-item"><div class="placeholder-card"><p>Search unavailable</p></div></li>';
-    });
-}
 
-window.onYouTubeIframeAPIReady = function() {
-  ytPlayer = new YT.Player('player', {
-    height: '0',
-    width: '0',
-    playerVars: { 'controls': 0 },
-    events: {
-      onReady: () => {
-        isPlayerReady = true;
-        ytReady = true;
-        const savedSongId = localStorage.getItem('currentSongID');
-        const savedTrackIndex = localStorage.getItem('currentTrackIndex');
-        if (savedSongId) {
-          playSong(savedSongId);
-        } else if (savedTrackIndex) {
-          playTrackByIndex(Number(savedTrackIndex));
-        } else {
-          playTrackByIndex(0);
-        }
-      },
-      onStateChange: (event) => {
-        if (event.data === YT.PlayerState.PLAYING) {
-          setPlaying(true);
-        } else if (event.data === YT.PlayerState.PAUSED) {
-          setPlaying(false);
-        } else if (event.data === YT.PlayerState.ENDED) {
-          shiftTrack(1);
-          if (tracks[currentTrackIndex].youtubeId) {
-            playSong(tracks[currentTrackIndex].youtubeId);
-          }
-        }
-      }
-    }
-  });
-}
-
-function playSong(youtubeId) {
-  if (!isPlayerReady || !ytPlayer || typeof ytPlayer.loadVideoById !== 'function') return;
-  ytPlayer.loadVideoById(youtubeId);
-  localStorage.setItem('currentSongID', youtubeId);
-  localStorage.setItem('currentTrackIndex', currentTrackIndex);
-}
 
 function updateMiniPlayerMetadata(title, artist, cover, videoId) {
   if (title && miniTitle) {
@@ -576,7 +463,8 @@ function playTrackByIndex(index) {
     });
   }
   if (track.src) {
-    playNimiq(track.src);
+    const audio = document.getElementById('main-audio');
+    if (audio) { audio.src = track.src; audio.play().catch(() => {}); }
   } else {
     openFullPlayer();
   }
@@ -1320,11 +1208,7 @@ function filterTracks(query) {
 playTriggers.forEach((trigger, index) => {
   trigger.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (trigger.dataset.youtubeId === TEST_SONG.id) {
-      playTestSong();
-    } else {
-      playTrackByIndex(index);
-    }
+    playTrackByIndex(index);
   });
 });
 

@@ -34,14 +34,14 @@ app.get('/stream/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { stdout } = await execAsync(
-      `yt-dlp "https://youtube.com/watch?v=${id}" -f bestaudio[ext=m4a] --get-url --no-warnings`,
+      `yt-dlp "https://youtube.com/watch?v=${id}" -f bestaudio[ext=m4a] --print title --print uploader --print thumbnail --print url --no-warnings`,
       { shell: true }
     );
 
-    const url = stdout.trim();
-    if (!url) return res.status(404).json({ error: 'No audio stream found' });
+    const lines = stdout.trim().split('\n').filter(Boolean);
+    if (lines.length < 4) return res.status(404).json({ error: 'No audio stream found' });
 
-    res.json({ url });
+    res.json({ title: lines[0], artist: lines[1], thumbnail: lines[2], url: lines[3] });
   } catch (e) {
     console.error('Stream error:', e.message);
     res.status(500).json({ error: e.message });
