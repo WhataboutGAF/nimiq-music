@@ -174,47 +174,57 @@ async function searchNimiq(query) {
   }
 }
 
-async function getAudioStream(videoId) {
-  try {
-    const res = await fetch(`https://nimiq-music.onrender.com/stream/${videoId}`);
-    if (!res.ok) {
-      if (uiErrorMessage) { uiErrorMessage.hidden = false; uiErrorMessage.textContent = 'Stream failed'; }
-      return false;
+let ytPlayer = null;
+let ytReady = false;
+
+window.onYouTubeIframeAPIReady = function() {
+  ytPlayer = new YT.Player('player', {
+    height: '0', width: '0',
+    playerVars: { controls: 0, autoplay: 1 },
+    events: {
+      onReady: () => { ytReady = true; },
+      onStateChange: (e) => {
+        if (e.data === YT.PlayerState.PLAYING) setPlaying(true);
+        else if (e.data === YT.PlayerState.PAUSED) setPlaying(false);
+        else if (e.data === YT.PlayerState.ENDED) {
+          if (currentTrackQueue.length > 0) {
+            const next = currentTrackQueue.shift();
+            playYT(next.videoId, next.title, next.artist, next.cover);
+          }
+        }
+      }
     }
-    const data = await res.json();
-    if (!data.url) {
-      if (uiErrorMessage) { uiErrorMessage.hidden = false; uiErrorMessage.textContent = 'No audio stream found'; }
-      return false;
-    }
-    
-    const audio = document.getElementById('main-audio');
-    if (!audio) return false;
-    
-    audio.src = data.url;
-    currentPlayingTrack = { videoId, title: data.title, artist: data.artist, cover: data.thumbnail || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
-    
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setPlaying(true);
-          if (fullPlayToggle) fullPlayToggle.classList.remove('loading');
-          if (miniPlayToggle) miniPlayToggle.classList.remove('loading');
-          updateMiniPlayerMetadata(currentPlayingTrack.title, currentPlayingTrack.artist, currentPlayingTrack.cover, videoId);
-          if (miniPlayer) requestAnimationFrame(() => { if (miniPlayer) miniPlayer.classList.add('is-visible'); });
-        })
-        .catch(() => {
-          if (fullPlayToggle) fullPlayToggle.classList.remove('loading');
-          if (miniPlayToggle) miniPlayToggle.classList.remove('loading');
-        });
-    }
-    
-    addToHistory({ videoId, title: currentPlayingTrack.title, artist: currentPlayingTrack.artist, thumbnail: currentPlayingTrack.cover });
-    return true;
-  } catch (e) {
-    if (uiErrorMessage) { uiErrorMessage.hidden = false; uiErrorMessage.textContent = 'Stream unavailable'; }
-    return false;
+  });
+};
+
+let currentTrackQueue = [];
+
+function playYT(videoId, title, artist, cover) {
+  if (!ytReady || !ytPlayer) {
+    currentTrackQueue.push({ videoId, title, artist, cover });
+    return;
   }
+  ytPlayer.loadVideoById(videoId);
+  currentPlayingTrack = { videoId, title, artist, cover: cover || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
+  updateMiniPlayerMetadata(title, artist, currentPlayingTrack.cover, videoId);
+  if (miniPlayer) requestAnimationFrame(() => { if (miniPlayer) miniPlayer.classList.add('is-visible'); });
+  if (fullPlayToggle) fullPlayToggle.classList.remove('loading');
+  if (miniPlayToggle) miniPlayToggle.classList.remove('loading');
+  addToHistory({ videoId, title, artist, thumbnail: currentPlayingTrack.cover });
+  setPlaying(true);
+}
+
+function toggleYTPlay() {
+  if (!ytPlayer) return;
+  if (isPlaying) ytPlayer.pauseVideo();
+  else ytPlayer.playVideo();
+}
+
+function getAudioStream(videoId, title, artist, cover) {
+  if (fullPlayToggle) fullPlayToggle.classList.add('loading');
+  if (miniPlayToggle) miniPlayToggle.classList.add('loading');
+  playYT(videoId, title, artist, cover);
+  return true;
 }
 
 
@@ -368,25 +378,9 @@ function setPlaying(nextState) {
   updatePlayButtons();
   updateSongListUI();
   localStorage.setItem('isPlaying', nextState ? '1' : '0');
-  const audio = document.getElementById('main-audio');
-  if (audio) {
-    if (nextState) {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            isPlaying = true;
-            updatePlayButtons();
-          })
-          .catch(error => {
-            console.log('Playback prevented:', error);
-            isPlaying = false;
-            updatePlayButtons();
-          });
-      }
-    } else {
-      audio.pause();
-    }
+  if (ytPlayer) {
+    if (nextState) ytPlayer.playVideo();
+    else ytPlayer.pauseVideo();
   }
 }
 
@@ -462,7 +456,9 @@ function playTrackByIndex(index) {
       if (miniPlayer) miniPlayer.classList.add('is-visible');
     });
   }
-  if (track.src) {
+  if (track.videoId && ytReady) {
+    playYT(track.videoId, track.title, track.artist, track.cover);
+  } else if (track.src) {
     const audio = document.getElementById('main-audio');
     if (audio) { audio.src = track.src; audio.play().catch(() => {}); }
   } else {
@@ -1416,9 +1412,7 @@ document.addEventListener('click', (e) => {
     e.stopPropagation();
     const videoId = playTrigger.dataset.videoid;
     if (videoId) {
-      if (fullPlayToggle) fullPlayToggle.classList.add('loading');
-      if (miniPlayToggle) miniPlayToggle.classList.add('loading');
-      getAudioStream(videoId);
+      getAudioStream(videoId, playTrigger.dataset.title, playTrigger.dataset.artist, playTrigger.dataset.cover);
     }
     return;
   }
@@ -1453,7 +1447,7 @@ document.addEventListener('click', (e) => {
     e.stopPropagation();
     const videoId = libraryItem.dataset.videoid;
     if (videoId) {
-      getAudioStream(videoId);
+      getAudioStream(videoId, libraryItem.dataset.title, libraryItem.dataset.artist, libraryItem.dataset.cover);
     }
   }
 
@@ -1462,7 +1456,7 @@ document.addEventListener('click', (e) => {
     e.stopPropagation();
     const videoId = songItem.dataset.videoid;
     if (videoId) {
-      getAudioStream(videoId);
+      getAudioStream(videoId, songItem.dataset.title, songItem.dataset.artist, songItem.dataset.cover);
     }
   }
 
