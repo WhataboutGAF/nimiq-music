@@ -228,7 +228,8 @@ function playYT(videoId, title, artist, cover) {
     return;
   }
   ytPlayer.loadVideoById(videoId);
-  currentPlayingTrack = { videoId, title, artist, cover: cover || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
+  const safeCover = cover && cover !== 'undefined' && cover !== 'null' ? cover : `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
+  currentPlayingTrack = { videoId, title, artist, cover: safeCover };
   updateMiniPlayerMetadata(title, artist, currentPlayingTrack.cover, videoId);
   if (miniPlayer) requestAnimationFrame(() => { if (miniPlayer) miniPlayer.classList.add('is-visible'); });
   if (fullPlayToggle) fullPlayToggle.classList.remove('loading');
@@ -255,15 +256,15 @@ function getAudioStream(videoId, title, artist, cover) {
 function updateMiniPlayerMetadata(title, artist, cover, videoId) {
   if (title && miniTitle) {
     miniTitle.textContent = title;
-    console.log('Set title:', title);
   }
   if (artist && miniArtist) miniArtist.textContent = artist;
-  if (cover && miniCover) {
-    miniCover.src = cover;
+  const safeCover = cover && cover !== 'undefined' && cover !== 'null' ? cover : `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
+  if (miniCover) {
+    miniCover.src = safeCover;
     miniCover.alt = title ? `${title} cover` : '';
   }
-  if (cover && fullCover) {
-    fullCover.src = cover;
+  if (fullCover) {
+    fullCover.src = safeCover;
   }
   if (title && fullTitle) fullTitle.textContent = title;
   if (artist && fullArtist) fullArtist.textContent = artist;
@@ -1367,63 +1368,63 @@ updateSettingsPersonalization();
 
 async function loadHomeContent() {
   try {
-    const res = await fetch('https://nimiq-music.onrender.com/search?q=Top+Hits+2026');
-    if (!res.ok) return;
-    const items = await res.json();
-    if (items.length === 0) return;
-    
-    const topResults = items.slice(0, 3).map(item => ({
-      title: item.title,
-      uploader: item.artist,
-      thumbnail: item.thumbnail || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400',
-      videoId: item.videoId
-    }));
-    
-    const recommendations = items.slice(3, 10).map(item => ({
-      title: item.title,
-      uploader: item.artist,
-      thumbnail: item.thumbnail || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200',
-      videoId: item.videoId
-    }));
-    
+    const [trendingRes, popRes, hiphopRes] = await Promise.allSettled([
+      fetch('https://nimiq-music.onrender.com/search?q=trending+music+2026'),
+      fetch('https://nimiq-music.onrender.com/search?q=pop+hits+2026'),
+      fetch('https://nimiq-music.onrender.com/search?q=hip+hop+2026')
+    ]);
+
+    const allItems = [];
+    const getItems = (res) => res.status === 'fulfilled' && res.value.ok ? res.value.json() : Promise.resolve([]);
+    const [trending, pop, hiphop] = await Promise.all([getItems(trendingRes), getItems(popRes), getItems(hiphopRes)]);
+
+    const sections = [
+      { label: 'Trending Now', items: trending.slice(0, 3), id: 'topResults' },
+      { label: 'Pop Hits', items: pop.slice(0, 3), id: null },
+      { label: 'Hip Hop', items: hiphop.slice(0, 3), id: null }
+    ];
+
     const topResultsContainer = document.querySelector('.top-results');
     const recommendationsContainer = document.querySelector('.recommendations');
-    
-    if (topResultsContainer) {
-      topResultsContainer.innerHTML = topResults.map(t => `
-        <button class="result-card play-trigger" data-title="${t.title}" data-artist="${t.uploader}" data-cover="${t.thumbnail}" data-videoid="${t.videoId}" data-duration="180" aria-label="Play ${t.title}">
-          <img src="${t.thumbnail}" alt="${t.title}" onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400'" />
+
+    if (topResultsContainer && trending.length > 0) {
+      topResultsContainer.innerHTML = trending.slice(0, 3).map(t => `
+        <button class="result-card play-trigger" data-title="${t.title.replace(/"/g, '&quot;')}" data-artist="${(t.artist || '').replace(/"/g, '&quot;')}" data-cover="${t.thumbnail || ''}" data-videoid="${t.videoId}" data-duration="180" aria-label="Play ${t.title}">
+          <img src="${t.thumbnail || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400'}" alt="${t.title}" onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400'" />
           <div class="card-meta">
             <p>${t.title}</p>
-            <span>${t.uploader}</span>
+            <span>${t.artist || ''}</span>
           </div>
         </button>
       `).join('');
     }
-    
-    if (recommendationsContainer) {
-      recommendationsContainer.innerHTML = recommendations.map(r => `
+
+    let recHtml = '';
+    for (const section of sections) {
+      if (section.items.length === 0) continue;
+      recHtml += `<h3 class="view-sub-heading" style="margin-top:24px;">${section.label}</h3>`;
+      recHtml += section.items.map(r => `
         <li>
-          <button class="recommendation-play play-trigger" data-title="${r.title}" data-artist="${r.uploader}" data-cover="${r.thumbnail}" data-videoid="${r.videoId}" data-duration="180" aria-label="Play ${r.title}">
-            <img src="${r.thumbnail}" alt="${r.title}" onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200'" />
+          <button class="recommendation-play play-trigger" data-title="${(r.title || '').replace(/"/g, '&quot;')}" data-artist="${(r.artist || '').replace(/"/g, '&quot;')}" data-cover="${r.thumbnail || ''}" data-videoid="${r.videoId}" data-duration="180" aria-label="Play ${r.title}">
+            <img src="${r.thumbnail || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200'}" alt="${r.title}" onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200'" />
             <div>
               <p>${r.title}</p>
-              <span>${r.uploader}</span>
+              <span>${r.artist || ''}</span>
             </div>
           </button>
-          <button class="like-btn" data-videoid="${r.videoId}" data-title="${r.title}" data-artist="${r.uploader}" data-cover="${r.thumbnail}" aria-label="Like">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
+          <button class="like-btn" data-videoid="${r.videoId}" data-title="${(r.title || '').replace(/"/g, '&quot;')}" data-artist="${(r.artist || '').replace(/"/g, '&quot;')}" data-cover="${r.thumbnail || ''}" aria-label="Like">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </button>
           <button class="menu-button" aria-label="More options for ${r.title}" aria-haspopup="dialog">•••</button>
         </li>
       `).join('');
     }
-    
-    if (typeof updateLikeButtons === 'function') {
-      updateLikeButtons();
+
+    if (recommendationsContainer && recHtml) {
+      recommendationsContainer.innerHTML = recHtml;
     }
+
+    if (typeof updateLikeButtons === 'function') updateLikeButtons();
   } catch (e) {
     console.error('Failed to load home content:', e);
   }
