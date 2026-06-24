@@ -177,28 +177,45 @@ async function searchNimiq(query) {
 let ytPlayer = null;
 let ytReady = false;
 
+setTimeout(() => {
+  if (!ytReady && typeof YT !== 'undefined' && YT.Player) {
+    ytPlayer = new YT.Player('player', {
+      height: '0', width: '0',
+      playerVars: { controls: 0, autoplay: 1 },
+      events: {
+        onReady: () => { ytReady = true; processQueue(); },
+        onStateChange: (e) => handleYTState(e)
+      }
+    });
+  }
+}, 3000);
+
+function processQueue() {
+  while (currentTrackQueue.length > 0) {
+    const t = currentTrackQueue.shift();
+    playYT(t.videoId, t.title, t.artist, t.cover);
+  }
+}
+
+function handleYTState(e) {
+  if (e.data === YT.PlayerState.PLAYING) setPlaying(true);
+  else if (e.data === YT.PlayerState.PAUSED) setPlaying(false);
+  else if (e.data === YT.PlayerState.ENDED) {
+    if (currentTrackQueue.length > 0) {
+      const next = currentTrackQueue.shift();
+      playYT(next.videoId, next.title, next.artist, next.cover);
+    }
+  }
+}
+
 window.onYouTubeIframeAPIReady = function() {
+  if (ytPlayer) return;
   ytPlayer = new YT.Player('player', {
     height: '0', width: '0',
     playerVars: { controls: 0, autoplay: 1 },
     events: {
-      onReady: () => {
-        ytReady = true;
-        while (currentTrackQueue.length > 0) {
-          const t = currentTrackQueue.shift();
-          playYT(t.videoId, t.title, t.artist, t.cover);
-        }
-      },
-      onStateChange: (e) => {
-        if (e.data === YT.PlayerState.PLAYING) setPlaying(true);
-        else if (e.data === YT.PlayerState.PAUSED) setPlaying(false);
-        else if (e.data === YT.PlayerState.ENDED) {
-          if (currentTrackQueue.length > 0) {
-            const next = currentTrackQueue.shift();
-            playYT(next.videoId, next.title, next.artist, next.cover);
-          }
-        }
-      }
+      onReady: () => { ytReady = true; processQueue(); },
+      onStateChange: handleYTState
     }
   });
 };
@@ -1460,6 +1477,7 @@ document.addEventListener('click', (e) => {
   const songItem = e.target.closest('.song-item');
   if (songItem) {
     e.stopPropagation();
+    e.preventDefault();
     const videoId = songItem.dataset.videoid;
     if (videoId) {
       getAudioStream(videoId, songItem.dataset.title, songItem.dataset.artist, songItem.dataset.cover);
