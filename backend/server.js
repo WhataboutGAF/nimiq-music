@@ -27,16 +27,16 @@ app.get('/search', async (req, res) => {
     if (!q) return res.status(400).json({ error: 'Missing query' });
 
     const { stdout } = await execAsync(
-      `yt-dlp "ytsearch5:${q}" --flat-playlist --dump-json --no-warnings ${cookieFlag()}`,
+      `yt-dlp "ytsearch10:${q}" --flat-playlist --dump-json --no-warnings --ignore-no-formats-error ${cookieFlag()}`,
       { shell: true, maxBuffer: 1024 * 1024 }
     );
 
     const results = stdout.trim().split('\n').filter(Boolean).map(JSON.parse);
     res.json(results.map(r => ({
-      title: r.title,
-      artist: r.uploader,
+      title: r.title || 'Unknown',
+      artist: r.uploader || r.channel || 'Unknown Artist',
       videoId: r.id,
-      thumbnail: r.thumbnail
+      thumbnail: r.thumbnail || `https://i.ytimg.com/vi/${r.id}/mqdefault.jpg`
     })));
   } catch (e) {
     console.error('Search error:', e.message);
