@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { writeFileSync, existsSync } from 'fs';
 import express from 'express';
 import cors from 'cors';
 
@@ -7,13 +8,26 @@ const execAsync = promisify(exec);
 const app = express();
 app.use(cors());
 
+const COOKIE_PATH = '/tmp/yt-cookies.txt';
+if (process.env.YOUTUBE_COOKIES && !existsSync(COOKIE_PATH)) {
+  try {
+    writeFileSync(COOKIE_PATH, process.env.YOUTUBE_COOKIES);
+  } catch (e) {
+    console.error('Failed to write cookies file:', e.message);
+  }
+}
+
+function cookieFlag() {
+  return existsSync(COOKIE_PATH) ? `--cookies "${COOKIE_PATH}"` : '';
+}
+
 app.get('/search', async (req, res) => {
   try {
     const { q } = req.query;
     if (!q) return res.status(400).json({ error: 'Missing query' });
 
     const { stdout } = await execAsync(
-      `yt-dlp "ytsearch5:${q}" --dump-json --no-warnings`,
+      `yt-dlp "ytsearch5:${q}" --dump-json --no-warnings ${cookieFlag()}`,
       { shell: true, maxBuffer: 1024 * 1024 }
     );
 
@@ -34,7 +48,7 @@ app.get('/stream/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { stdout } = await execAsync(
-      `yt-dlp "https://youtube.com/watch?v=${id}" -f bestaudio[ext=m4a] --print title --print uploader --print thumbnail --print url --no-warnings`,
+      `yt-dlp "https://youtube.com/watch?v=${id}" -f bestaudio[ext=m4a] --print title --print uploader --print thumbnail --print url --no-warnings ${cookieFlag()}`,
       { shell: true }
     );
 
