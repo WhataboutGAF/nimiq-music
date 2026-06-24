@@ -47,15 +47,25 @@ app.get('/search', async (req, res) => {
 app.get('/stream/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { stdout } = await execAsync(
-      `yt-dlp "https://youtube.com/watch?v=${id}" --extractor-args "youtube:player_client=android" --print title --print uploader --print thumbnail --print url --no-warnings --no-playlist --ignore-no-formats-error ${cookieFlag()}`,
-      { shell: true }
-    );
+    const url = `https://youtube.com/watch?v=${id}`;
+    const cook = cookieFlag();
 
-    const lines = stdout.trim().split('\n').filter(Boolean);
-    if (lines.length < 4) return res.status(404).json({ error: 'No audio stream found' });
+    const [metaResult, urlResult] = await Promise.allSettled([
+      execAsync(`yt-dlp "${url}" --print title --print uploader --print thumbnail --no-warnings --no-playlist ${cook}`, { shell: true }),
+      execAsync(`yt-dlp "${url}" --get-url --extractor-args "youtube:player_client=android" --no-warnings --no-playlist --ignore-no-formats-error ${cook}`, { shell: true })
+    ]);
 
-    res.json({ title: lines[0], artist: lines[1], thumbnail: lines[2], url: lines[3] });
+    const metaLines = metaResult.status === 'fulfilled' ? metaResult.value.stdout.trim().split('\n').filter(Boolean) : [];
+    const streamUrl = urlResult.status === 'fulfilled' ? urlResult.value.stdout.trim() : null;
+
+    if (!streamUrl) return res.status(404).json({ error: 'No audio stream found' });
+
+    res.json({
+      title: metaLines[0] || 'Unknown',
+      artist: metaLines[1] || 'Unknown Artist',
+      thumbnail: metaLines[2] || `https://i.ytimg.com/vi/${id}/mqdefault.jpg`,
+      url: streamUrl
+    });
   } catch (e) {
     console.error('Stream error:', e.message);
     res.status(500).json({ error: e.message });
