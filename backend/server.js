@@ -48,7 +48,7 @@ app.get('/stream/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { stdout } = await execAsync(
-      `yt-dlp "https://youtube.com/watch?v=${id}" --print title --print uploader --print thumbnail --print url --no-warnings ${cookieFlag()}`,
+      `yt-dlp "https://youtube.com/watch?v=${id}" --print title --print uploader --print thumbnail --print url --no-warnings --no-playlist ${cookieFlag()}`,
       { shell: true }
     );
 
