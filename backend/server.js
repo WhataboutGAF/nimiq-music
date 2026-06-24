@@ -27,7 +27,7 @@ app.get('/search', async (req, res) => {
     if (!q) return res.status(400).json({ error: 'Missing query' });
 
     const { stdout } = await execAsync(
-      `yt-dlp "ytsearch5:${q}" --dump-json --no-warnings ${cookieFlag()}`,
+      `yt-dlp "ytsearch5:${q}" --flat-playlist --dump-json --no-warnings ${cookieFlag()}`,
       { shell: true, maxBuffer: 1024 * 1024 }
     );
 
@@ -48,7 +48,7 @@ app.get('/stream/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { stdout } = await execAsync(
-      `yt-dlp "https://youtube.com/watch?v=${id}" -f bestaudio[ext=m4a] --print title --print uploader --print thumbnail --print url --no-warnings ${cookieFlag()}`,
+      `yt-dlp "https://youtube.com/watch?v=${id}" -f "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best" --print title --print uploader --print thumbnail --print url --no-warnings ${cookieFlag()}`,
       { shell: true }
     );
 
