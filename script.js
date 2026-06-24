@@ -170,40 +170,25 @@ async function searchNimiq(query) {
     window.history.pushState({path:newContextUrl},'',newContextUrl);
   }
   
-  const proxy = 'https://api.allorigins.win/raw?url=';
-  const baseUrl = 'https://pipedapi.drgns.space';
-  const endpoint = baseUrl + '/search?q=' + encodeURIComponent(query) + '&filter=music_songs';
-  
-  let response;
   try {
-    response = await fetch(proxy + encodeURIComponent(endpoint));
-  } catch (networkError) {
-    console.error('Network Error:', networkError);
-    showError('Network Error: Check Proxy Connection.');
+    const res = await fetch(`https://nimiq-music.onrender.com/search?q=${encodeURIComponent(query)}`);
+    if (!res.ok) { showError('Search failed'); return; }
+    const data = await res.json();
+    mockResults = data.map(item => ({
+      title: item.title,
+      uploader: item.artist,
+      thumbnail: item.thumbnail,
+      videoId: item.videoId
+    }));
+  } catch (e) {
+    showError('Search unavailable');
     return;
   }
   
-  if (!response.ok) {
-    const errMsg = 'Search failed: HTTP ' + response.status;
-    console.error(errMsg);
-    showError(errMsg);
-    return;
-  }
-  
-  const data = await response.json();
-  
-  const items = data.items || [];
-  if (items.length === 0) {
+  if (mockResults.length === 0) {
     if (resultsList) resultsList.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:20px;">No results found</p>';
     return;
   }
-  
-  mockResults = items.map(item => ({
-    title: item.title || item.name || 'Unknown',
-    uploader: item.uploader || item.uploaderName || 'Unknown Artist',
-    thumbnail: item.thumbnails?.[0]?.url || item.thumbnail?.[0]?.url || '',
-    videoId: item.id || (item.url ? item.url.split('?v=')[1] : '')
-  }));
   
   if (mockResults.length > 0 && topResult) {
     const top = mockResults[0];
@@ -236,86 +221,46 @@ async function searchNimiq(query) {
 }
 
 async function getAudioStream(videoId) {
-  const proxy = 'https://api.allorigins.win/raw?url=';
-  const baseUrl = 'https://pipedapi.drgns.space';
-  const endpoint = baseUrl + '/streams/' + videoId;
-  
-  let response;
   try {
-    response = await fetch(proxy + encodeURIComponent(endpoint));
-  } catch (networkError) {
-    console.error('Network Error:', networkError);
-    if (uiErrorMessage) {
-      uiErrorMessage.hidden = false;
-      uiErrorMessage.textContent = 'Network Error: Check Proxy Connection.';
+    const res = await fetch(`https://nimiq-music.onrender.com/stream/${videoId}`);
+    if (!res.ok) {
+      if (uiErrorMessage) { uiErrorMessage.hidden = false; uiErrorMessage.textContent = 'Stream failed'; }
+      return false;
     }
-    return false;
-  }
-  
-  if (!response.ok) {
-    const errMsg = 'Stream failed: HTTP ' + response.status;
-    console.error(errMsg);
-    if (uiErrorMessage) {
-      uiErrorMessage.hidden = false;
-      uiErrorMessage.textContent = errMsg;
+    const data = await res.json();
+    if (!data.url) {
+      if (uiErrorMessage) { uiErrorMessage.hidden = false; uiErrorMessage.textContent = 'No audio stream found'; }
+      return false;
     }
-    return false;
-  }
-  
-  const data = await response.json();
-  
-  const audioStream = data.audioStreams?.[0];
-  const fallbackThumb = 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200';
-  
-  if (audioStream && audioStream.url) {
+    
     const audio = document.getElementById('main-audio');
-    if (audio) {
-      audio.src = audioStream.url;
-      
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        currentPlayingTrack = {
-          videoId: videoId,
-          title: data.title || 'Unknown',
-          artist: data.uploader || 'Unknown Artist',
-          cover: data.thumbnailUrl || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
-        };
-        
-        playPromise
-          .then(() => {
-            setPlaying(true);
-            if (fullPlayToggle) fullPlayToggle.classList.remove('loading');
-            if (miniPlayToggle) miniPlayToggle.classList.remove('loading');
-            
-            updateMiniPlayerMetadata(currentPlayingTrack.title, currentPlayingTrack.artist, currentPlayingTrack.cover, videoId);
-            
-            if (miniPlayer) {
-              requestAnimationFrame(() => {
-                if (miniPlayer) miniPlayer.classList.add('is-visible');
-              });
-            }
-          })
-          .catch(error => {
-            console.log('Playback prevented:', error);
-            if (fullPlayToggle) fullPlayToggle.classList.remove('loading');
-            if (miniPlayToggle) miniPlayToggle.classList.remove('loading');
-          });
-      }
-      
-      const thumbnail = data.thumbnailUrl || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
-      addToHistory({
-        videoId: videoId,
-        title: data.title || 'Unknown',
-        artist: data.uploader || 'Unknown Artist',
-        thumbnail: thumbnail
-      });
-      
-      return true;
+    if (!audio) return false;
+    
+    audio.src = data.url;
+    currentPlayingTrack = { videoId, title: 'Loading...', artist: '...', cover: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` };
+    
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setPlaying(true);
+          if (fullPlayToggle) fullPlayToggle.classList.remove('loading');
+          if (miniPlayToggle) miniPlayToggle.classList.remove('loading');
+          updateMiniPlayerMetadata(currentPlayingTrack.title, currentPlayingTrack.artist, currentPlayingTrack.cover, videoId);
+          if (miniPlayer) requestAnimationFrame(() => { if (miniPlayer) miniPlayer.classList.add('is-visible'); });
+        })
+        .catch(() => {
+          if (fullPlayToggle) fullPlayToggle.classList.remove('loading');
+          if (miniPlayToggle) miniPlayToggle.classList.remove('loading');
+        });
     }
+    
+    addToHistory({ videoId, title: currentPlayingTrack.title, artist: currentPlayingTrack.artist, thumbnail: currentPlayingTrack.cover });
+    return true;
+  } catch (e) {
+    if (uiErrorMessage) { uiErrorMessage.hidden = false; uiErrorMessage.textContent = 'Stream unavailable'; }
+    return false;
   }
-  
-  console.error('No audio stream found');
-  return false;
 }
 
 function searchMusic(query) {
@@ -1518,31 +1463,24 @@ updateLikeButtons();
 updateSettingsPersonalization();
 
 async function loadHomeContent() {
-  const proxy = 'https://api.allorigins.win/raw?url=';
-  const baseUrl = 'https://pipedapi.drgns.space';
-  const query = 'Top Hits 2026';
-  const endpoint = baseUrl + '/search?q=' + encodeURIComponent(query) + '&filter=music_songs';
-  
   try {
-    const response = await fetch(proxy + encodeURIComponent(endpoint));
-    if (!response.ok) return;
-    
-    const data = await response.json();
-    const items = data.items || [];
+    const res = await fetch('https://nimiq-music.onrender.com/search?q=Top+Hits+2026');
+    if (!res.ok) return;
+    const items = await res.json();
     if (items.length === 0) return;
     
     const topResults = items.slice(0, 3).map(item => ({
-      title: item.title || 'Unknown',
-      uploader: item.uploader || 'Unknown Artist',
-      thumbnail: item.thumbnails?.[0]?.url || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400',
-      videoId: item.id || ''
+      title: item.title,
+      uploader: item.artist,
+      thumbnail: item.thumbnail || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400',
+      videoId: item.videoId
     }));
     
     const recommendations = items.slice(3, 10).map(item => ({
-      title: item.title || 'Unknown',
-      uploader: item.uploader || 'Unknown Artist',
-      thumbnail: item.thumbnails?.[0]?.url || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200',
-      videoId: item.id || ''
+      title: item.title,
+      uploader: item.artist,
+      thumbnail: item.thumbnail || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200',
+      videoId: item.videoId
     }));
     
     const topResultsContainer = document.querySelector('.top-results');
