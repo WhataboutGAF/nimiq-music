@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NIMIQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script>
+      (function() {
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('theme-black');
+        }
+      })();
+    </script>
+    <audio id="main-audio"></audio>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="shell-header">
+        <h1>NIMIQ</h1>
+        <button id="headerSearchBtn" class="header-search-btn" aria-label="Search">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </header>
+
+      <article class="phone-screen home-screen">
+        <section class="content-stack">
+          <section class="app-view is-active" data-view="home">
+            <h2 class="view-main-heading">Browse</h2>
+            <div class="category-pills">
+              <button class="pill is-active">Popular</button>
+              <button class="pill">New</button>
+              <button class="pill">Trend</button>
+            </div>
+
+            <div class="top-results" aria-label="Top result cards">
+            <button
+              class="result-card is-active play-trigger"
+              data-title="Smooth Operator"
+              data-artist="Sade"
+              data-cover="https://i.ytimg.com/vi/4TYv2PhG89A/maxresdefault.jpg"
+              data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+              data-duration="282"
+              data-videoid="4TYv2PhG89A"
+              aria-label="Play Smooth Operator"
+            >
+              <img src="https://i.ytimg.com/vi/4TYv2PhG89A/maxresdefault.jpg" alt="Smooth Operator album art" />
+              <div class="card-meta">
+                <p>Smooth Operator</p>
+                <span>Sade</span>
+              </div>
+            </button>
+            <button
+              class="result-card play-trigger"
+              data-title="Echo Valley"
+              data-artist="Cira Nova"
+              data-cover="https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?auto=format&fit=crop&w=640&q=80"
+              data-videoid="dQw4w9WgXcQ"
+              data-duration="248"
+              aria-label="Play Echo Valley"
+            >
+              <img src="https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?auto=format&fit=crop&w=640&q=80" alt="Echo Valley album art" />
+              <div class="card-meta">
+                <p>Echo Valley</p>
+                <span>Cira Nova</span>
+              </div>
+            </button>
+            <button
+              class="result-card play-trigger"
+              data-title="Velvet Pulse"
+              data-artist="Rhea Knox"
+              data-cover="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=640&q=80"
+              data-videoid="dQw4w9WgXcQ"
+              data-duration="215"
+              aria-label="Play Velvet Pulse"
+            >
+              <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=640&q=80" alt="Velvet Pulse album art" />
+              <div class="card-meta">
+                <p>Velvet Pulse</p>
+                <span>Rhea Knox</span>
+              </div>
+            </button>
+          </div>
+
+            <div class="recommendations-wrap">
+              <h3 class="view-sub-heading">Recommended</h3>
+              <ul class="recommendations">
+                <li>
+                  <button
+                    class="recommendation-play play-trigger"
+                    data-title="Northern Lights"
+                    data-artist="Juno Hale"
+                    data-cover="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=240&q=80"
+                    data-videoid="dQw4w9WgXcQ"
+                    data-duration="235"
+                    aria-label="Play Northern Lights"
+                  >
+                    <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=240&q=80" alt="Northern Lights song" />
+                    <div>
+                      <p>Northern Lights</p>
+                      <span>Juno Hale</span>
+                    </div>
+                  </button>
+                  <button class="like-btn" data-videoid="dQw4w9WgXcQ" data-title="Northern Lights" data-artist="Juno Hale" data-cover="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=240&q=80" aria-label="Like">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                  </button>
+                  <button class="menu-button" aria-label="More options for Northern Lights" aria-haspopup="dialog">•••</button>
+                </li>
+                <li>
+                  <button
+                    class="recommendation-play play-trigger"
+                    data-title="Static Bloom"
+                    data-artist="Cira Nova"
+                    data-cover="https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=240&q=80"
+                    data-videoid="dQw4w9WgXcQ"
+                    data-duration="212"
+                    aria-label="Play Static Bloom"
+                  >
+                    <img src="https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=240&q=80" alt="Static Bloom song" />
+                    <div>
+                      <p>Static Bloom</p>
+                      <span>Cira Nova</span>
+                    </div>
+                  </button>
+                  <button class="like-btn" data-videoid="dQw4w9WgXcQ" data-title="Static Bloom" data-artist="Cira Nova" data-cover="https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=240&q=80" aria-label="Like">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                  </button>
+                  <button class="menu-button" aria-label="More options for Static Bloom" aria-haspopup="dialog">•••</button>
+                </li>
+                <li>
+                  <button
+                    class="recommendation-play play-trigger"
+                    data-title="Aftertone"
+                    data-artist="Rhea Knox"
+                    data-cover="https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=240&q=80"
+                    data-videoid="dQw4w9WgXcQ"
+                    data-duration="243"
+                    aria-label="Play Aftertone"
+                  >
+                    <img src="https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=240&q=80" alt="Aftertone song" />
+                    <div>
+                      <p>Aftertone</p>
+                      <span>Rhea Knox</span>
+                    </div>
+                  </button>
+                  <button class="like-btn" data-videoid="dQw4w9WgXcQ" data-title="Aftertone" data-artist="Rhea Knox" data-cover="https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=240&q=80" aria-label="Like">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                  </button>
+                  <button class="menu-button" aria-label="More options for Aftertone" aria-haspopup="dialog">•••</button>
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="app-view" data-view="search">
+            <h2>Search</h2>
+            <div class="search-container">
+              <div class="search-bar-wrapper">
+                <label for="searchInput" class="sr-only">Search songs or artists</label>
+                <input id="searchInput" class="search-input" type="text" placeholder="What do you want to listen to?" autocomplete="off" />
+                <button id="clearSearchBtn" class="clear-btn" aria-label="Clear search" hidden>&times;</button>
+              </div>
+              
+              <div id="browseSection" class="browse-section">
+                <h3>Browse Categories</h3>
+                <div class="category-grid">
+                  <div class="category-card" data-category="pop" style="--gradient: linear-gradient(135deg, #E13300, #F77737);">
+                    <span>Pop</span>
+                    <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                  </div>
+                  <div class="category-card" data-category="hiphop" style="--gradient: linear-gradient(135deg, #8B5CF6, #A855F7);">
+                    <span>Hip Hop</span>
+                    <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                  </div>
+                  <div class="category-card" data-category="rock" style="--gradient: linear-gradient(135deg, #EF4444, #F97316);">
+                    <span>Rock</span>
+                    <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                  </div>
+                  <div class="category-card" data-category="electronic" style="--gradient: linear-gradient(135deg, #06B6D4, #3F76FF);">
+                    <span>Electronic</span>
+                    <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                  </div>
+                  <div class="category-card" data-category="jazz" style="--gradient: linear-gradient(135deg, #F59E0B, #FBBF24);">
+                    <span>Jazz</span>
+                    <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                  </div>
+                  <div class="category-card" data-category="classical" style="--gradient: linear-gradient(135deg, #64748B, #94A3B8);">
+                    <span>Classical</span>
+                    <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                  </div>
+                </div>
+              </div>
+              
+              <div id="resultsSection" class="results-section" hidden>
+                <h3 id="resultsHeader" style="margin-bottom: 20px; color: var(--text-secondary);">Showing results</h3>
+                <div id="topResult" class="top-result"></div>
+                <div class="results-songs">
+                  <h3>Songs</h3>
+                  <div id="resultsList" class="results-list"></div>
+                </div>
+              </div>
+              
+              <div id="uiErrorMessage" class="ui-error-message" hidden></div>
+            </div>
+          </section>
+
+          <section class="app-view library-view" data-view="library">
+            <header class="library-header-simple">
+              <h2>Your Library</h2>
+              <button class="lib-action-btn plus-btn" id="createPlaylistBtnTop" aria-label="Create Playlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            </header>
+
+            <div id="libraryContent" class="library-list"></div>
+          </section>
+
+          <section class="app-view playlist-detail-view" data-view="playlist-detail">
+            <header class="detail-header">
+              <button class="back-btn" id="backToLibrary" aria-label="Back to library">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <select id="playlistSortFilter" class="playlist-sort-select" aria-label="Sort playlist">
+                <option value="recent">Recently Added</option>
+                <option value="oldest">Oldest Added</option>
+                <option value="title">Title</option>
+              </select>
+            </header>
+
+            <div class="detail-content">
+              <div class="detail-cover-container">
+                <img id="detailCover" src="" alt="Playlist cover" class="detail-cover" />
+              </div>
+              
+              <h1 id="detailTitle" class="detail-title">Playlist Name</h1>
+              
+              <div class="detail-meta">
+                <p id="detailStats" class="detail-stats"></p>
+              </div>
+
+              <div class="detail-actions">
+                <div class="secondary-actions">
+                  <button class="action-btn-circle" aria-label="Add to your library"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+                  <button class="action-btn-circle" aria-label="Download"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17V3m-7 7 7 7 7-7"/></svg></button>
+                  <button class="action-btn-circle" aria-label="More"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+                </div>
+                <div class="primary-actions">
+                  <button class="shuffle-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M3 3l5 5M15 15l6 6"/></svg></button>
+                  <button class="big-play-btn" id="playlistPlayBtn">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div id="detailSongs" class="detail-songs-list"></div>
+            </div>
+          </section>
+
+          <section class="app-view profile-view" data-view="profile">
+            <div class="profile-container">
+              <header class="profile-header">
+                <div class="avatar-container">
+                  <div class="avatar-gradient-bg">
+                    <img id="userAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120" alt="User avatar" class="user-avatar" />
+                  </div>
+                  <input type="file" id="avatarUpload" hidden accept="image/*" />
+                  <button id="changeAvatarBtn" class="avatar-edit-badge" aria-label="Change avatar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </button>
+                </div>
+                <div class="user-info">
+                  <input type="text" id="userNameInput" class="username-input" value="Nimiq User" spellcheck="false" />
+                  <p class="user-handle">@nimiq_explorer</p>
+                </div>
+              </header>
+
+              <div class="settings-card">
+                <section class="settings-group">
+                  <h3 class="section-title">appearance</h3>
+                  
+                  <div class="setting-item">
+                    <label class="setting-label">Accent color</label>
+                    <div class="accent-color-grid">
+                      <button class="color-swatch emerald" data-accent="#10b981" aria-label="Emerald green"></button>
+                      <button class="color-swatch pink is-active" data-accent="#ec4899" aria-label="Pink"></button>
+                      <button class="color-swatch purple" data-accent="#8b5cf6" aria-label="Purple"></button>
+                      <button class="color-swatch violet" data-accent="#7c3aed" aria-label="Violet"></button>
+                    </div>
+                  </div>
+
+                  <div class="setting-item">
+                    <label class="setting-label">Interface style</label>
+                    <div class="style-grid" id="interfaceStyle">
+                      <button class="grid-btn is-active" data-value="minimal">minimal</button>
+                      <button class="grid-btn" data-value="macos">macos</button>
+                      <button class="grid-btn" data-value="winxp">windows xp</button>
+                      <button class="grid-btn" data-value="neobrutalism">neobrutalism</button>
+                      <button class="grid-btn" data-value="glass">glass</button>
+                      <button class="grid-btn" data-value="retro">retro</button>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="settings-group">
+                  <h3 class="section-title">music room / party</h3>
+                  <div class="room-sessions">
+                    <div class="room-placeholder">
+                      <p>no active music rooms</p>
+                      <button class="create-room-btn">start a music room</button>
+                    </div>
+                  </div>
+                </section>
+
+                <div class="settings-actions">
+                  <button class="action-btn outline" id="resetProfileBtn">reset</button>
+                  <button class="action-btn solid" id="saveProfileBtn">save changes</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="app-view" data-view="artist">
+            <h2>Artist</h2>
+            <div class="artist-header" id="artistHeader">
+              <img id="artistImage" src="" alt="" class="artist-cover" />
+              <div class="artist-info">
+                <h3 id="artistName">Artist Name</h3>
+                <p id="artistStats">0 monthly listeners</p>
+              </div>
+            </div>
+            <div class="artist-songs">
+              <h3>Songs</h3>
+              <ul id="artistSongs" class="artist-songs-list"></ul>
+            </div>
+          </section>
+
+
+        </section>
+
+        <div class="persistent-player" aria-live="polite">
+          <div class="mini-player" id="miniPlayer" role="button" tabindex="0" aria-label="Open full player">
+            <img id="miniCover" src="" alt="" />
+            <div class="mini-meta">
+              <p id="miniTitle">Track Title</p>
+              <span id="miniArtist">Artist Name</span>
+            </div>
+            <div class="mini-player-actions">
+              <button class="mini-like-btn" id="miniLikeBtn" aria-label="Like">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+              </button>
+              <button class="mini-play-toggle" id="miniPlayToggle" aria-label="Play">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5,3 19,12 5,21"/>
+                </svg>
+              </button>
+            </div>
+            <div class="mini-player-progress">
+              <div class="fill" id="miniProgressFill"></div>
+            </div>
+          </div>
+
+          <nav class="bottom-nav" aria-label="Bottom navigation">
+            <button class="nav-item is-active" data-tab="home" aria-label="Home">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.2a.8.8 0 0 0-.8-.8h-3.4a.8.8 0 0 0-.8.8V21H5a1 1 0 0 1-1-1z" />
+              </svg>
+            </button>
+            <button class="nav-item" data-tab="search" aria-label="Search">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="6" />
+                <path d="M20 20l-4.2-4.2" />
+              </svg>
+            </button>
+            <button class="nav-item" data-tab="library" aria-label="Your Library">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/>
+              </svg>
+            </button>
+
+            <button class="nav-item" data-tab="profile" aria-label="Profile">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </button>
+          </nav>
+
+        </div>
+      </article>
+    </main>
+<section class="track-menu-overlay" id="trackMenuOverlay" inert tabindex="-1">
+      <div class="track-menu-sheet" role="dialog" aria-modal="true" aria-label="Track options">
+        <header class="track-menu-head">
+          <p id="trackMenuTitle">Track Options</p>
+          <button id="closeTrackMenu" class="track-menu-close" aria-label="Close track options">✕</button>
+        </header>
+        <ul class="track-menu-list">
+          <li data-menu-type="song">
+            <button class="track-menu-item" data-action="like" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              <span id="likeMenuLabel">Like</span>
+            </button>
+          </li>
+          <li data-menu-type="song">
+            <button class="track-menu-item" data-action="hide" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+              </svg>
+              <span>Hide Song</span>
+            </button>
+          </li>
+          <li data-menu-type="song">
+            <button class="track-menu-item" data-action="queue" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 6h16M4 12h10M4 18h4"/><path d="M14 18l4-4 4 4"/>
+              </svg>
+              <span>Play Next</span>
+            </button>
+          </li>
+          <li data-menu-type="song">
+            <button class="track-menu-item" data-action="playlist" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7h10"/><path d="M4 12h10"/><path d="M4 17h6"/><path d="M16 13v8"/><path d="M12 17h8"/>
+              </svg>
+              <span>Add to Playlist</span>
+            </button>
+          </li>
+          <li data-menu-type="song">
+            <button class="track-menu-item" data-action="artist" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="3.2"/><path d="M5 19a7 7 0 0 1 14 0"/>
+              </svg>
+              <span>View Artist</span>
+            </button>
+          </li>
+          <li data-menu-type="song">
+            <button class="track-menu-item" data-action="album" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="12" cy="12" r="4"/>
+              </svg>
+              <span>View Album</span>
+            </button>
+          </li>
+          <li data-menu-type="playlist-item">
+            <button class="track-menu-item" data-action="rename_playlist" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              <span>Rename Playlist</span>
+            </button>
+          </li>
+          <li data-menu-type="playlist-item">
+            <button class="track-menu-item" data-action="delete_playlist" type="button" style="color:#ff4444;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+              <span>Delete Playlist</span>
+            </button>
+          </li>
+          <li>
+            <button class="track-menu-item" data-action="download" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Download</span>
+            </button>
+          </li>
+          <li>
+            <button class="track-menu-item" data-action="share" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 11l7.4-4.2"/><path d="M8.2 13l7.4 4.2"/>
+              </svg>
+              <span>Share</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="full-player" id="fullPlayer" inert>
+      <div class="full-player-inner">
+        <header class="full-player-top">
+          <button id="closePlayer" class="top-btn" aria-label="Close player">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <p class="mini-label">Now Playing</p>
+          <button class="top-pill-menu menu-button" aria-label="Player menu">
+            <span>...</span>
+          </button>
+        </header>
+
+        <div class="cover-container">
+          <img id="fullCover" src="" alt="Current song artwork" class="cover-art" />
+        </div>
+
+        <div class="song-meta-row">
+          <div class="song-meta">
+            <h3 id="fullTitle">Track Title</h3>
+            <p id="fullArtist">Artist Name</p>
+          </div>
+          <button id="fullLikeBtn" class="full-like-btn" aria-label="Like this song">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        </div>
+
+
+        <div class="track-progress-row">
+          <span id="currentTime" class="time-stamp">0:00</span>
+          <div class="waveform-container" id="waveformContainer">
+            <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+          </div>
+          <span id="totalTime" class="time-stamp">0:00</span>
+          <div id="progressFill" style="display:none;"></div>
+        </div>
+
+        <div class="controls" aria-label="Playback controls">
+          <button class="control-btn secondary" id="shuffleBtn" aria-label="Shuffle">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M3 3l5 5M15 15l6 6"/></svg>
+          </button>
+          <button class="control-btn" id="prevBtn" aria-label="Previous track">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+            </svg>
+          </button>
+          <button class="control-btn play" id="fullPlayToggle" aria-label="Play">
+            <svg class="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5,3 19,12 5,21"/>
+            </svg>
+            <svg class="pause-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+              <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+            </svg>
+          </button>
+          <button class="control-btn" id="nextBtn" aria-label="Next track">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+          <button class="control-btn secondary" id="repeatBtn" aria-label="Repeat">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </button>
+        </div>
+
+        <button class="lyrics-btn" aria-label="View Lyrics">Lyrics &darr;</button>
+      </div>
+    </section>
+
+    <div id="modalOverlay" class="modal-overlay" hidden>
+      <div class="modal-content" role="dialog" aria-modal="true">
+        <header class="modal-header">
+          <h3 id="modalTitle">Modal Title</h3>
+          <button id="closeModal" class="modal-close" aria-label="Close">&times;</button>
+        </header>
+        <div id="modalBody" class="modal-body"></div>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
